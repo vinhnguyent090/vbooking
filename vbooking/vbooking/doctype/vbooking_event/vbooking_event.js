@@ -1,0 +1,75 @@
+// Copyright (c) 2017, vinhnguyen.t090@gmail.com and contributors
+// For license information, please see license.txt
+
+frappe.ui.form.on('vBooking Event', {
+	/*
+	onload_post_render: function(frm) {
+		frm.get_field("employees").grid.set_multiple_add("employee");
+	}
+	*/
+	/*
+	validate: function(frm) {
+			frappe.call({
+				method: "frappe.client.get_value",
+				args: {
+					doctype: "Event",
+					fieldname: "name",
+					filters: {
+						resource: frm.doc.resource,
+						//starts_on: [">=", frm.doc.starts_on],
+						//ends_on: ["<=", frm.doc.ends_on],
+						starts_on: [">=", frm.doc.starts_on],
+						ends_on: ["<=", frm.doc.ends_on],
+					},
+				},
+				callback: function(r, rt) {
+					if (r.message.name && r.message.name!=frm.doc.resource) {
+                        			frappe.msgprint(__("{0} is already exists.", [r.message.name]));
+						//frappe.throw(__("{0} is already exists.", [r.message.name]));
+						frappe.validated = 0;
+					}
+				}
+			});
+		},
+	*/		
+	onload: function(frm) {
+		frm.set_query("ref_type", function(txt) {
+			return {
+				"filters": {
+					"issingle": 0,
+				}
+			};
+		});
+	},
+	refresh: function(frm) {
+		if(frm.doc.ref_type && frm.doc.ref_name) {
+			frm.add_custom_button(__(frm.doc.ref_name), function() {
+				frappe.set_route("Form", frm.doc.ref_type, frm.doc.ref_name);
+			});
+		}
+	},
+	repeat_on: function(frm) {
+		if(frm.doc.repeat_on==="Every Day") {
+			["monday", "tuesday", "wednesday", "thursday",
+				"friday", "saturday", "sunday"].map(function(v) {
+					frm.set_value(v, 1);
+				});
+		}
+	},
+	vbooking_resource_check: function(frm) {
+        frm.set_value('event_type', "Public");
+        var resource_name = cur_frm.doc.vbooking_resource;
+        var booking = "Booking: ";
+        frm.set_value('subject', booking + resource_name);
+        frm.set_value('color', '#78d6ff');
+    },
+	vbooking_resource: function(frm) {
+        if(cur_frm.doc.vbooking_resource_check=='1'){
+            var resource_name = cur_frm.doc.vbooking_resource;
+            var booking = "Booking: ";
+            frm.set_value('subject', booking + resource_name);
+        } 
+    },
+
+
+});

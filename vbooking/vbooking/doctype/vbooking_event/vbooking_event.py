@@ -11,11 +11,12 @@ import json
 from frappe.model.document import Document
 from frappe.utils.user import get_enabled_system_users
 from frappe.desk.reportview import get_filters_cond
-from frappe.utils import (getdate, cint, add_months, date_diff, add_days,
+from frappe.utils import (getdate, cint, add_months, date_diff, add_days, add_years,
 	nowdate, get_datetime_str, cstr, get_datetime, now_datetime, format_datetime)
 
 
 weekdays = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
+max_repeat_till = add_years(nowdate(), 1)
 
 class vBookingEvent(Document):
 	
@@ -35,7 +36,9 @@ class vBookingEvent(Document):
 			frappe.msgprint(frappe._("Every day events should finish on the same day."), raise_exception=True)
 		
 		""" check date """
-		self.validate_date()
+
+		if self.vbooking_resource:
+			self.validate_date()
 
 		#events = get_events(self.starts_on, self.ends_on)
 		#frappe.msgprint(str(result))
@@ -60,7 +63,7 @@ class vBookingEvent(Document):
 
 				event_start, time_str = get_datetime_str(e.starts_on).split(" ")
 				if cstr(e.repeat_till) == "":
-					repeat = "3000-01-01"
+					repeat = max_repeat_till
 				else:
 					repeat = e.repeat_till
 				if e.repeat_on=="Every Year":
@@ -120,14 +123,13 @@ class vBookingEvent(Document):
 							add_event(e, date)
 					remove_events.append(e)
 
-			
-
+		
 		start = self.starts_on
 		end = self.ends_on
 
 		if self.repeat_this_event:
 			if cstr(self.repeat_till) == "":
-				end = "3000-01-01"
+				end = max_repeat_till
 			else:
 				end = self.repeat_till
 
@@ -135,10 +137,12 @@ class vBookingEvent(Document):
 		start = start.split(" ")[0]
 		end = end.split(" ")[0]
 		
-		
-		filter_condition = " and name != '%s'" % self.name
+		filter_condition = ""
+		if self.name:
+			filter_condition = " and name != '%s'" % self.name
+		if self.vbooking_resource:
+			filter_condition = " and vbooking_resource = '%s'" % self.vbooking_resource
 
-		# get appointments on that day for physician
 		query = """
 		select name,
 			starts_on, ends_on, all_day, repeat_this_event, repeat_on,repeat_till,
@@ -149,7 +153,7 @@ class vBookingEvent(Document):
 			or (starts_on <= %(start)s and ends_on >= %(end)s)
 		) or (
 			starts_on <= %(start)s and repeat_this_event=1 and
-			ifnull(repeat_till, "3000-01-01") > %(start)s
+			ifnull(repeat_till, %(end)s) > %(start)s
 		)) {filter_condition}""".format(filter_condition= filter_condition)
 
 		
@@ -165,10 +169,15 @@ class vBookingEvent(Document):
 		for e in events:
 			get_repeat_events(e)
 
+		
+
 		for e in remove_events:
 			events.remove(e)
 
 		events =  events + add_events
+		
+		if(len(events)==0):
+			return None
 
 		# get self events
 		self_events = []
@@ -268,7 +277,7 @@ def get_events(start, end, user=None, for_reminder=False, filters=None):
 			or (date(starts_on) <= date(%(start)s) and date(ends_on) >= date(%(end)s))
 		) or (
 			date(starts_on) <= date(%(start)s) and repeat_this_event=1 and
-			ifnull(repeat_till, "3000-01-01") > date(%(start)s)
+			ifnull(repeat_till, %(max_repeat_till)s) > date(%(start)s)
 		))
 		{reminder_condition}
 		{filter_condition}
@@ -281,6 +290,7 @@ def get_events(start, end, user=None, for_reminder=False, filters=None):
 			reminder_condition="and ifnull(send_reminder,0)=1" if for_reminder else "",
 			roles=", ".join('"{}"'.format(frappe.db.escape(r)) for r in roles)
 		), {
+			"max_repeat_till": max_repeat_till,
 			"start": start,
 			"end": end,
 			"user": user,
@@ -310,7 +320,7 @@ def get_events(start, end, user=None, for_reminder=False, filters=None):
 
 			event_start, time_str = get_datetime_str(e.starts_on).split(" ")
 			if cstr(e.repeat_till) == "":
-				repeat = "3000-01-01"
+				repeat = max_repeat_till
 			else:
 				repeat = e.repeat_till
 			if e.repeat_on=="Every Year":

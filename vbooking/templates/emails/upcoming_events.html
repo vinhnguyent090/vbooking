@@ -1,0 +1,9 @@
+{% for e in events %}
+<p>
+	<span class="text-bold">{{ e.starts_on }}: </span><span>{{ e.subject }}</span>
+	<div>{{ e.description or '' }}</div>
+</p>
+{% endfor %}
+<p class="more-info">
+	{{ _("Daily Booking Event is sent where reminders are set.") }}
+</p>

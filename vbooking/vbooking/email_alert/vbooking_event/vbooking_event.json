@@ -1,0 +1,24 @@
+{
+ "attach_print": 0, 
+ "creation": "2017-12-17 16:12:47.972306", 
+ "days_in_advance": 0, 
+ "docstatus": 0, 
+ "doctype": "Email Alert", 
+ "document_type": "vBooking Event", 
+ "enabled": 1, 
+ "event": "Submit", 
+ "idx": 0, 
+ "is_standard": 1, 
+ "message": "<h3>{{_(\"Booking Event\")}}</h3>\n\n<p>{{ doc.introduction }}</p>\n\n<h4>{{_(\"Details\")}}</h4>\n{{_(\"Event Name\")}}: {{ frappe.utils.get_link_to_form(doc.doctype, doc.name) }}\n<br>{{_(\"Event Location\")}}: {{ doc.location }}\n<br>{{_(\"Start Time\")}}: {{ doc.start_time }}\n<br>{{_(\"End Time\")}}: {{ doc.end_time }}", 
+ "modified": "2017-12-17 20:59:31.996848", 
+ "modified_by": "Administrator", 
+ "module": "vBooking", 
+ "name": "vBooking Event", 
+ "owner": "Administrator", 
+ "recipients": [
+  {
+   "email_by_document_field": "employee_emails"
+  }
+ ], 
+ "subject": "Booking Event {{ doc.name }}"
+}

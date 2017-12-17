@@ -14,6 +14,8 @@ from frappe.desk.reportview import get_filters_cond
 from frappe.utils import (getdate, cint, add_months, date_diff, add_days, add_years,
 	nowdate, get_datetime_str, cstr, get_datetime, now_datetime, format_datetime)
 
+from erpnext.hr.doctype.employee.employee import get_employee_emails
+
 
 weekdays = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
 max_repeat_till = add_years(nowdate(), 1)
@@ -21,6 +23,9 @@ max_repeat_till = add_years(nowdate(), 1)
 class vBookingEvent(Document):
 	
 	def validate(self):
+
+		self.employee_emails = ', '.join(get_employee_emails([d.employee
+			for d in self.employees]))
 
 		if not self.starts_on:
 			self.starts_on = now_datetime()
@@ -169,8 +174,6 @@ class vBookingEvent(Document):
 		for e in events:
 			get_repeat_events(e)
 
-		
-
 		for e in remove_events:
 			events.remove(e)
 
@@ -238,39 +241,41 @@ def has_permission(doc, user):
 
 	return False
 
-
-def send_event_digest():
+@frappe.whitelist()
+def send_event_digest(doc, user):
+	
 	today = nowdate()
-	for user in get_enabled_system_users():
-		events = get_events(today, today, user.name, for_reminder=True)
-		if events:
-			frappe.set_user_lang(user.name, user.language)
+	events = get_events(today, today, None, for_reminder=True)
 
-			for e in events:
-				e.starts_on = format_datetime(e.starts_on, 'hh:mm a')
-				if e.all_day:
-					e.starts_on = "All Day"
+	if events:
+		for e in events:
+			if e.employee_emails:
+				employee_emails = e.employee_emails.split(',')
+				
+				for email in employee_emails:
+					e.starts_on = format_datetime(e.starts_on, 'hh:mm a')
+					if e.all_day:
+						e.starts_on = "All Day"
 
-			frappe.sendmail(
-				recipients=user.email,
-				subject=frappe._("Upcoming Events for Today"),
-				template="upcoming_events",
-				args={
-					'events': events,
-				},
-				header=[frappe._("Events in Today's Calendar"), 'blue']
-			)
+					frappe.sendmail(
+						recipients= email,
+						subject=frappe._("Upcoming Booking Events for Today"),
+						template="upcoming_events",
+						args={
+							'events': events,
+						},
+						header=[frappe._("Events in Today's Calendar"), 'blue']
+					)
 
 @frappe.whitelist()
 def get_events(start, end, user=None, for_reminder=False, filters=None):
-	if not user:
-		user = frappe.session.user
+
 	if isinstance(filters, string_types):
 		filters = json.loads(filters)
-	roles = frappe.get_roles(user)
+
 	events = frappe.db.sql("""select name, subject, description, color,
 		starts_on, ends_on, owner, all_day, event_type, repeat_this_event, repeat_on,repeat_till,
-		monday, tuesday, wednesday, thursday, friday, saturday, sunday
+		monday, tuesday, wednesday, thursday, friday, saturday, sunday, employee_emails
 		from `tabvBooking Event` where ((
 			(date(starts_on) between date(%(start)s) and date(%(end)s))
 			or (date(ends_on) between date(%(start)s) and date(%(end)s))
@@ -281,19 +286,13 @@ def get_events(start, end, user=None, for_reminder=False, filters=None):
 		))
 		{reminder_condition}
 		{filter_condition}
-		and (event_type='Public' or owner=%(user)s
-		or exists(select name from `tabDocShare` where
-			tabDocShare.share_doctype="Event" and `tabDocShare`.share_name=`tabvBooking Event`.name
-			and tabDocShare.user=%(user)s))
 		order by starts_on""".format(
 			filter_condition=get_filters_cond('Event', filters, []),
-			reminder_condition="and ifnull(send_reminder,0)=1" if for_reminder else "",
-			roles=", ".join('"{}"'.format(frappe.db.escape(r)) for r in roles)
+			reminder_condition="and ifnull(send_reminder,0)=1" if for_reminder else ""
 		), {
 			"max_repeat_till": max_repeat_till,
 			"start": start,
 			"end": end,
-			"user": user,
 		}, as_dict=1)
 
 	# process recurring events

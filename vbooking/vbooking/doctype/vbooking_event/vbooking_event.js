@@ -2,36 +2,9 @@
 // For license information, please see license.txt
 
 frappe.ui.form.on('vBooking Event', {
-	/*
 	onload_post_render: function(frm) {
 		frm.get_field("employees").grid.set_multiple_add("employee");
-	}
-	*/
-	/*
-	validate: function(frm) {
-			frappe.call({
-				method: "frappe.client.get_value",
-				args: {
-					doctype: "Event",
-					fieldname: "name",
-					filters: {
-						resource: frm.doc.resource,
-						//starts_on: [">=", frm.doc.starts_on],
-						//ends_on: ["<=", frm.doc.ends_on],
-						starts_on: [">=", frm.doc.starts_on],
-						ends_on: ["<=", frm.doc.ends_on],
-					},
-				},
-				callback: function(r, rt) {
-					if (r.message.name && r.message.name!=frm.doc.resource) {
-                        			frappe.msgprint(__("{0} is already exists.", [r.message.name]));
-						//frappe.throw(__("{0} is already exists.", [r.message.name]));
-						frappe.validated = 0;
-					}
-				}
-			});
-		},
-	*/		
+	},	
 	onload: function(frm) {
 		frm.set_query("ref_type", function(txt) {
 			return {

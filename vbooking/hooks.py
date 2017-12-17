@@ -79,24 +79,27 @@ app_license = "MIT"
 # ---------------
 # Hook on document methods and events
 
-# doc_events = {
+doc_events = {
 # 	"*": {
 # 		"on_update": "method",
 # 		"on_cancel": "method",
-# 		"on_trash": "method"
+#		"on_trash": "method"
 #	}
-# }
+#    "vBooking Event": {
+#        "on_update" : "vbooking.vbooking.doctype.vbooking_event.vbooking_event.send_event_digest"
+#    }
+}
 
 # Scheduled Tasks
 # ---------------
 
-# scheduler_events = {
+scheduler_events = {
 # 	"all": [
 # 		"vbooking.tasks.all"
 # 	],
-# 	"daily": [
-# 		"vbooking.tasks.daily"
-# 	],
+ 	"daily": [
+ 		"vbooking.vbooking.doctype.vbooking_event.vbooking_event.send_event_digest"
+ 	]
 # 	"hourly": [
 # 		"vbooking.tasks.hourly"
 # 	],
@@ -106,7 +109,7 @@ app_license = "MIT"
 # 	"monthly": [
 # 		"vbooking.tasks.monthly"
 # 	]
-# }
+}
 
 # Testing
 # -------

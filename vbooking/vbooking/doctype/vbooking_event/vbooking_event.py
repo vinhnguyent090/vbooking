@@ -7,14 +7,17 @@ from six.moves import range
 from six import string_types
 import frappe
 import json
+from frappe import _
 
 from frappe.model.document import Document
 from frappe.utils.user import get_enabled_system_users
 from frappe.desk.reportview import get_filters_cond
 from frappe.utils import (getdate, cint, add_months, date_diff, add_days, add_years,
 	nowdate, get_datetime_str, cstr, get_datetime, now_datetime, format_datetime)
+from frappe.utils.background_jobs import enqueue
 
 from erpnext.hr.doctype.employee.employee import get_employee_emails
+
 
 
 weekdays = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
@@ -31,7 +34,7 @@ class vBookingEvent(Document):
 			self.starts_on = now_datetime()
 
 		if self.starts_on and self.ends_on and get_datetime(self.starts_on) > get_datetime(self.ends_on):
-			frappe.msgprint(frappe._("Event end must be after start1"), raise_exception=True)
+			frappe.msgprint(frappe._("Event end must be after start"), raise_exception=True)
 
 		if self.starts_on == self.ends_on:
 			# this scenario doesn't make sense i.e. it starts and ends at the same second!
@@ -41,7 +44,6 @@ class vBookingEvent(Document):
 			frappe.msgprint(frappe._("Every day events should finish on the same day."), raise_exception=True)
 		
 		""" check date """
-
 		if self.vbooking_resource:
 			self.validate_date()
 
@@ -144,9 +146,9 @@ class vBookingEvent(Document):
 		
 		filter_condition = ""
 		if self.name:
-			filter_condition = " and name != '%s'" % self.name
+			filter_condition += " and name != '%s'" % self.name
 		if self.vbooking_resource:
-			filter_condition = " and vbooking_resource = '%s'" % self.vbooking_resource
+			filter_condition += " and vbooking_resource = '%s'" % self.vbooking_resource
 
 		query = """
 		select name,
@@ -217,15 +219,17 @@ class vBookingEvent(Document):
 			if result is not None:
 				break
 			for f in events:
-				if ( get_datetime(f.starts_on) <  get_datetime(e.starts_on) <  get_datetime(f.ends_on)) \
-				or ( get_datetime(f.starts_on) <  get_datetime(e.ends_on) <  get_datetime(f.ends_on)):
+				if ( get_datetime(f.starts_on) <=  get_datetime(e.starts_on) <  get_datetime(f.ends_on)) \
+				or ( get_datetime(f.starts_on) <  get_datetime(e.ends_on) <=  get_datetime(f.ends_on)):
 					result = f
 					break
 
-		#frappe.msgprint(str(result))
+		#frappe.msgprint(str(self_events))
 
 		if result is not None:
-			frappe.msgprint(frappe._("This resource is booked by #{0}").format(result.name), raise_exception=True)
+			frappe.throw(frappe._("This resource is booked by #{0}").format(result.name))
+		
+		return result
 
 
 def get_permission_query_conditions(user):
@@ -245,27 +249,39 @@ def has_permission(doc, user):
 def send_event_digest(doc, user):
 	
 	today = nowdate()
-	events = get_events(today, today, None, for_reminder=True)
+	events = get_events(today, today, True, for_reminder=True)
 
+	send_events = {}
+	send_emails = []
 	if events:
 		for e in events:
+			e.starts_on = format_datetime(e.starts_on, 'hh:mm a')
+			#if e.all_day:
+			#	e.starts_on = "All Day"
 			if e.employee_emails:
 				employee_emails = e.employee_emails.split(',')
-				
 				for email in employee_emails:
-					e.starts_on = format_datetime(e.starts_on, 'hh:mm a')
-					if e.all_day:
-						e.starts_on = "All Day"
+					if email not in send_emails:
+						send_emails.append(email)
+	if send_emails:
+		for email in send_emails:
+			for e in events:
+				if email in e.employee_emails:
+					if not send_events.get(email):
+						send_events[email] = []
+					send_events[email].append(e)
+			if send_events.get(email):
+				frappe.sendmail(
+					recipients= email,
+					subject=frappe._("Upcoming Booking Events for Today"),
+					template="upcoming_events",
+					args={
+						'events': events,
+					},
+					header=[frappe._("Events in Today's Calendar"), 'blue']
+				)
+				#enqueue(method=frappe.sendmail, queue='short', timeout=300, async=True, **email_args)
 
-					frappe.sendmail(
-						recipients= email,
-						subject=frappe._("Upcoming Booking Events for Today"),
-						template="upcoming_events",
-						args={
-							'events': events,
-						},
-						header=[frappe._("Events in Today's Calendar"), 'blue']
-					)
 
 @frappe.whitelist()
 def get_events(start, end, user=None, for_reminder=False, filters=None):

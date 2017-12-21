@@ -44,6 +44,8 @@ class vBookingEvent(Document):
 			frappe.msgprint(frappe._("Every day events should finish on the same day."), raise_exception=True)
 		
 		""" check date """
+		if not self.vbooking_resource_check:
+			self.vbooking_resource = ''
 		if self.vbooking_resource:
 			self.validate_date()
 
@@ -155,12 +157,12 @@ class vBookingEvent(Document):
 			starts_on, ends_on, all_day, repeat_this_event, repeat_on,repeat_till,
 			monday, tuesday, wednesday, thursday, friday, saturday, sunday, booked_by
 		from `tabvBooking Event` where ((
-			(starts_on between %(start)s and %(end)s)
-			or (ends_on between %(start)s and %(end)s)
-			or (starts_on <= %(start)s and ends_on >= %(end)s)
+			(date(starts_on) between date(%(start)s) and date(%(end)s))
+			or (date(ends_on) between date(%(start)s) and date(%(end)s))
+			or (date(starts_on) <= date(%(start)s) and date(ends_on) >= date(%(end)s))
 		) or (
-			starts_on <= %(start)s and repeat_this_event=1 and
-			ifnull(repeat_till, %(end)s) > %(start)s
+			date(starts_on) <= date(%(start)s) and repeat_this_event=1 and
+			ifnull(repeat_till, date(%(end)s)) > date(%(start)s)
 		)) {filter_condition}""".format(filter_condition= filter_condition)
 
 		
@@ -222,7 +224,7 @@ class vBookingEvent(Document):
 				break
 			for f in events:
 				if ( get_datetime(f.starts_on) <=  get_datetime(e.starts_on) <  get_datetime(f.ends_on)) \
-				or ( get_datetime(f.starts_on) <  get_datetime(e.ends_on) <=  get_datetime(f.ends_on)):
+				or ( get_datetime(f.starts_on) <  get_datetime(e.ends_on) <=  get_datetime(f.ends_on)):	
 					result = f
 					break
 
@@ -232,7 +234,7 @@ class vBookingEvent(Document):
 			employee_name = None
 			if result.booked_by:
 				employee_name = frappe.db.get_value("Employee", result.booked_by, "employee_name")
-			frappe.throw(frappe._("{0} is booked by {1}").format(result.subject, employee_name))
+			frappe.throw(frappe._("<a href=""#Form/{3}/{0}"">#{0} - {1}</a> is booked by {2}").format(result.name, result.subject, employee_name, 'vBooking%20Event'))
 		
 		return result
 

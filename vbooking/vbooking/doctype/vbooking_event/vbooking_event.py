@@ -151,9 +151,9 @@ class vBookingEvent(Document):
 			filter_condition += " and vbooking_resource = '%s'" % self.vbooking_resource
 
 		query = """
-		select name,
+		select name, subject,
 			starts_on, ends_on, all_day, repeat_this_event, repeat_on,repeat_till,
-			monday, tuesday, wednesday, thursday, friday, saturday, sunday
+			monday, tuesday, wednesday, thursday, friday, saturday, sunday, booked_by
 		from `tabvBooking Event` where ((
 			(starts_on between %(start)s and %(end)s)
 			or (ends_on between %(start)s and %(end)s)
@@ -188,6 +188,7 @@ class vBookingEvent(Document):
 		self_events = []
 		self_event = frappe._dict({
 			'name' : self.name,
+			'subject' : self.subject,
 			'starts_on' : self.starts_on,
 			'ends_on' : self.ends_on,
 			'all_day' : self.all_day,
@@ -201,6 +202,7 @@ class vBookingEvent(Document):
 			'friday' : self.friday,
 			'saturday' : self.saturday,
 			'sunday' : self.sunday,
+			'booked_by' : self.booked_by,
 		})
 		self_events.append(self_event)
 
@@ -227,10 +229,16 @@ class vBookingEvent(Document):
 		#frappe.msgprint(str(self_events))
 
 		if result is not None:
-			frappe.throw(frappe._("This resource is booked by #{0}").format(result.name))
+			employee_name = None
+			if result.booked_by:
+				employee_name = frappe.db.get_value("Employee", result.booked_by, "employee_name")
+			frappe.throw(frappe._("{0} is booked by {1}").format(result.subject, employee_name))
 		
 		return result
 
+def get_employee_name(self):
+		self.employee_name = frappe.db.get_value("Employee", self.employee, "employee_name")
+		return self.employee_name
 
 def get_permission_query_conditions(user):
 	if not user: user = frappe.session.user

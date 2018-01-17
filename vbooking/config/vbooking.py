@@ -4,13 +4,13 @@ from frappe import _
 def get_data():
 	return [
 		{
-			"label": _("Booking Resource"),
+			"label": _("Resource Booking"),
 			"icon": "fa fa-table",
 			"items": [
 				{
 					"type": "doctype",
-					"name": "vBooking Event",
-					"label": _("Booking Event")
+					"name": "Resource Booking",
+					"label": _("Resource Booking")
 				}
 			]
 
@@ -21,7 +21,7 @@ def get_data():
 			"items": [
 				{
 					"type": "doctype",
-					"name": "vBooking Resource",
+					"name": "Booking Resource",
 					"label": _("Booking Resource")
 				}
 			]

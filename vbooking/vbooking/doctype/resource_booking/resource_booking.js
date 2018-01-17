@@ -1,7 +1,7 @@
 // Copyright (c) 2017, vinhnguyen.t090@gmail.com and contributors
 // For license information, please see license.txt
 
-frappe.ui.form.on('vBooking Event', {
+frappe.ui.form.on('Resource Booking', {
 	onload_post_render: function(frm) {
 		frm.get_field("employees").grid.set_multiple_add("employee");
 	},	
@@ -33,7 +33,7 @@ frappe.ui.form.on('vBooking Event', {
         frm.set_value('color', '');
 		if(cur_frm.doc.vbooking_resource_check=='1'){
 			frm.set_value('event_type', "Public");
-			var resource_name = cur_frm.doc.vbooking_resource;
+			var resource_name = cur_frm.doc.booking_resource;
 			var booking = "Booking: ";
 			if(resource_name){
 				frm.set_value('subject', booking + resource_name);
@@ -41,10 +41,10 @@ frappe.ui.form.on('vBooking Event', {
 			}
 		}
     },
-	vbooking_resource: function(frm) {
+	booking_resource: function(frm) {
         frm.set_value('color', '');
 		if(cur_frm.doc.vbooking_resource_check=='1'){
-            var resource_name = cur_frm.doc.vbooking_resource;
+            var resource_name = cur_frm.doc.booking_resource;
 			frm.set_value('color', '');
             if(resource_name){
 				var booking = "Booking: ";

@@ -9,6 +9,6 @@ def get_data():
 			"color": "grey",
 			"icon": "octicon octicon-file-directory",
 			"type": "module",
-			"label": _("Booking Resource")
+			"label": _("Resource Booking")
 		}
 	]

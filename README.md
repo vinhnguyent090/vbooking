@@ -1,6 +1,6 @@
 ## Vbooking
 
-Booking Resource
+Resource Booking
 
 #### License
 

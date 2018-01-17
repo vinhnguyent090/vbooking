@@ -23,7 +23,7 @@ from erpnext.hr.doctype.employee.employee import get_employee_emails
 weekdays = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
 max_repeat_till = add_years(nowdate(), 1)
 
-class vBookingEvent(Document):
+class ResourceBooking(Document):
 	
 	def validate(self):
 
@@ -45,8 +45,8 @@ class vBookingEvent(Document):
 		
 		""" check date """
 		if not self.vbooking_resource_check:
-			self.vbooking_resource = ''
-		if self.vbooking_resource:
+			self.booking_resource = ''
+		if self.booking_resource:
 			self.validate_date()
 
 		#events = get_events(self.starts_on, self.ends_on)
@@ -149,14 +149,14 @@ class vBookingEvent(Document):
 		filter_condition = ""
 		if self.name:
 			filter_condition += " and name != '%s'" % self.name
-		if self.vbooking_resource:
-			filter_condition += " and vbooking_resource = '%s'" % self.vbooking_resource
+		if self.booking_resource:
+			filter_condition += " and booking_resource = '%s'" % self.booking_resource
 
 		query = """
 		select name, subject,
 			starts_on, ends_on, all_day, repeat_this_event, repeat_on,repeat_till,
 			monday, tuesday, wednesday, thursday, friday, saturday, sunday, booked_by
-		from `tabvBooking Event` where ((
+		from `tabResource Booking` where ((
 			(date(starts_on) between date(%(start)s) and date(%(end)s))
 			or (date(ends_on) between date(%(start)s) and date(%(end)s))
 			or (date(starts_on) <= date(%(start)s) and date(ends_on) >= date(%(end)s))
@@ -244,7 +244,7 @@ def get_employee_name(self):
 
 def get_permission_query_conditions(user):
 	if not user: user = frappe.session.user
-	return """(`tabvBooking Event`.event_type='Public' or `tabvBooking Event`.owner='%(user)s')""" % {
+	return """(`tabResource Booking`.event_type='Public' or `tabResource Booking`.owner='%(user)s')""" % {
 			"user": frappe.db.escape(user),
 			"roles": "', '".join([frappe.db.escape(r) for r in frappe.get_roles(user)])
 		}
@@ -302,7 +302,7 @@ def get_events(start, end, user=None, for_reminder=False, filters=None):
 	events = frappe.db.sql("""select name, subject, description, color,
 		starts_on, ends_on, owner, all_day, event_type, repeat_this_event, repeat_on,repeat_till,
 		monday, tuesday, wednesday, thursday, friday, saturday, sunday, employee_emails
-		from `tabvBooking Event` where ((
+		from `tabResource Booking` where ((
 			(date(starts_on) between date(%(start)s) and date(%(end)s))
 			or (date(ends_on) between date(%(start)s) and date(%(end)s))
 			or (date(starts_on) <= date(%(start)s) and date(ends_on) >= date(%(end)s))

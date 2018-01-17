@@ -1,10 +1,10 @@
-<h3>{{_("Booking Event")}}</h3>
+<h3>{{_("Resource Booking")}}</h3>
 
 <br>{{_("Subject")}}: {{ doc.subject }}
 <p>{{ doc.description }}</p>
 
 <h4>{{_("Details")}}</h4>
-{{_("Booking Event Name")}}: {{ frappe.utils.get_link_to_form(doc.doctype, doc.name) }}
+{{_("Resource Booking Name")}}: {{ frappe.utils.get_link_to_form(doc.doctype, doc.name) }}
 
 <br>{{_("Start Time")}}: 
     {% if(doc.repeat_on != 'Every Day') %} 

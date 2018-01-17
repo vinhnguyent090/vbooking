@@ -15,7 +15,7 @@ requirements = parse_requirements("requirements.txt", session="")
 setup(
 	name='vbooking',
 	version=version,
-	description='Booking Resource',
+	description='Resource Booking',
 	author='vinhnguyen.t090@gmail.com',
 	author_email='vinhnguyen.t090@gmail.com',
 	packages=find_packages(),

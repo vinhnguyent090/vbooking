@@ -1,0 +1,24 @@
+{
+ "attach_print": 0, 
+ "creation": "2017-12-17 16:12:47.972306", 
+ "days_in_advance": 0, 
+ "docstatus": 0, 
+ "doctype": "Email Alert", 
+ "document_type": "Resource Booking", 
+ "enabled": 1, 
+ "event": "Submit", 
+ "idx": 0, 
+ "is_standard": 1, 
+ "message": "<h3>{{_(\"Resource Booking\")}}</h3>\n\n<br>{{_(\"Subject\")}}: {{ doc.subject }}\n<p>{{ doc.description }}</p>\n\n<h4>{{_(\"Details\")}}</h4>\n{{_(\"Resource Booking Name\")}}: {{ frappe.utils.get_link_to_form(doc.doctype, doc.name) }}\n\n<br>{{_(\"Start Time\")}}: \n    {% if(doc.repeat_on != 'Every Day') %} \n        {{ doc.starts_on }} \n    {% else %}\n        {{ frappe.utils.format_datetime(doc.starts_on, \"hh:mm\") }}\n    {% endif %}\n\n<br>{{_(\"End Time\")}}: \n     {% if(doc.repeat_on != 'Every Day') %} \n        {{ doc.ends_on }} \n    {% else %}\n        {{ frappe.utils.format_datetime(doc.ends_on, \"hh:mm\") }}\n    {% endif %}\n\n{% if(doc.repeat_on) %}\n    <br>\n    <br>{{_(\"Repeat On\")}}:\n    {% if(doc.repeat_on != 'Every Day') %} \n        {{ doc.repeat_on }}\n    {% else %}\n        {% if(doc.monday) %}\n            &nbsp;{{_(\"Monday\")}}\n        {% endif %}\n        {% if(doc.tuesday) %}\n            &nbsp;{{_(\"Tuesday\")}}\n        {% endif %}\n        {% if(doc.wednesday) %}\n            &nbsp;{{_(\"Wednesday\")}}\n        {% endif %}\n        {% if(doc.thursday) %}\n            &nbsp;{{_(\"Thursday\")}}\n        {% endif %}\n        {% if(doc.friday) %}\n            &nbsp;{{_(\"Friday\")}}\n        {% endif %}\n        {% if(doc.saturday) %}\n            &nbsp;{{_(\"Saturday\")}}\n        {% endif %}\n        {% if(doc.sunday) %}\n            &nbsp;{{_(\"Sunday\")}}\n        {% endif %}\n    {% endif %}\n    {% if(doc.repeat_till) %}\n      <br>{{_(\"Repeat Till\")}}: {{ doc.repeat_till }}\n    {% endif %}\n{% endif %}\n", 
+ "modified": "2018-01-17 09:23:50.001657", 
+ "modified_by": "vincentnguyen.t090@gmail.com", 
+ "module": "vBooking", 
+ "name": "Resource Booking", 
+ "owner": "Administrator", 
+ "recipients": [
+  {
+   "email_by_document_field": "employee_emails"
+  }
+ ], 
+ "subject": "Resource Booking {{ doc.subject }}"
+}

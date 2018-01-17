@@ -85,8 +85,8 @@ doc_events = {
 # 		"on_cancel": "method",
 #		"on_trash": "method"
 #	}
-#    "vBooking Event": {
-#        "on_update" : "vbooking.vbooking.doctype.vbooking_event.vbooking_event.send_event_digest"
+#    "Resource Booking": {
+#        "on_update" : "vbooking.vbooking.doctype.resource_booking.resource_booking.send_event_digest"
 #    }
 }
 
@@ -98,7 +98,7 @@ scheduler_events = {
 # 		"vbooking.tasks.all"
 # 	],
  	"daily": [
- 		"vbooking.vbooking.doctype.vbooking_event.vbooking_event.send_event_digest"
+ 		"vbooking.vbooking.doctype.resource_booking.resource_booking.send_event_digest"
  	]
 # 	"hourly": [
 # 		"vbooking.tasks.hourly"

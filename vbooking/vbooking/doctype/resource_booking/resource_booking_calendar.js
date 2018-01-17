@@ -1,7 +1,7 @@
 // Copyright (c) 2015, Frappe Technologies Pvt. Ltd. and Contributors
 // License: GNU General Public License v3. See license.txt
 
-frappe.views.calendar["vBooking Event"] = {
+frappe.views.calendar["Resource Booking"] = {
 	field_map: {
 		"start": "starts_on",
 		"end": "ends_on",
@@ -15,5 +15,5 @@ frappe.views.calendar["vBooking Event"] = {
 		"Public": "success",
 		"Private": "info"
 	},
-	get_events_method: "vbooking.vbooking.doctype.vbooking_event.vbooking_event.get_events"
+	get_events_method: "vbooking.vbooking.doctype.resource_booking.resource_booking.get_events"
 }

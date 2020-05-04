@@ -2,4 +2,9 @@ DocType: Resource Booking,Resource Booking,Đặt chỗ
 DocType: Resource Booking,Resource,Cơ sở vật chất
 DocType: Resource Booking,Booked By,Đặt bởi
 
+DocType: Resource Booking,Every Day,Mỗi ngày
+DocType: Resource Booking,Every Week,Mỗi tuần
+DocType: Resource Booking,Every Month,Mỗi tháng
+DocType: Resource Booking,Every Year,Mỗi năm
+
 DocType: Booking Resource,Booking Resource,Cơ sở vật chất

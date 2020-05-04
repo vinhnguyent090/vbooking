@@ -6,6 +6,7 @@
  "engine": "InnoDB",
  "field_order": [
   "resource",
+  "color",
   "column_break_3",
   "company",
   "section_break_5",
@@ -74,9 +75,14 @@
    "options": "Booking Resource",
    "print_hide": 1,
    "read_only": 1
+  },
+  {
+   "fieldname": "color",
+   "fieldtype": "Color",
+   "label": "Color"
   }
  ],
- "modified": "2020-05-04 07:01:38.608208",
+ "modified": "2020-05-04 14:36:48.987579",
  "modified_by": "Administrator",
  "module": "vBooking",
  "name": "Booking Resource",

@@ -30,25 +30,25 @@ frappe.ui.form.on('Resource Booking', {
 		}
 	},
 	vbooking_resource_check: function(frm) {
-        frm.set_value('color', '');
+        // frm.set_value('color', '');
 		if(cur_frm.doc.vbooking_resource_check=='1'){
 			frm.set_value('event_type', "Public");
 			var resource_name = cur_frm.doc.booking_resource;
 			var booking = "Booking: ";
 			if(resource_name){
 				frm.set_value('subject', booking + resource_name);
-				frm.set_value('color', '#ff69b4');
+				// frm.set_value('color', '#ff69b4');
 			}
 		}
     },
 	booking_resource: function(frm) {
-        frm.set_value('color', '');
+        // frm.set_value('color', '');
 		if(cur_frm.doc.vbooking_resource_check=='1'){
             var resource_name = cur_frm.doc.booking_resource;
-			frm.set_value('color', '');
+			// frm.set_value('color', '');
             if(resource_name){
 				var booking = "Booking: ";
-				frm.set_value('color', '#ff69b4');
+				// frm.set_value('color', '#ff69b4');
             	frm.set_value('subject', booking + resource_name);
 			}
         } 

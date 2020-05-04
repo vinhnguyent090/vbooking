@@ -56,3 +56,5 @@ frappe.ui.form.on('Resource Booking', {
 
 
 });
+
+cur_frm.add_fetch('booking_resource','color','color');

@@ -231,10 +231,10 @@ class ResourceBooking(Document):
 		#frappe.msgprint(str(self_events))
 
 		if result is not None:
-			employee_name = None
+			employee_name = ""
 			if result.booked_by:
 				employee_name = frappe.db.get_value("Employee", result.booked_by, "employee_name")
-			frappe.throw(frappe._("<a href=""#Form/{3}/{0}"">#{0} - {1}</a> is booked by {2}").format(result.name, result.subject, employee_name, 'vBooking%20Event'))
+			frappe.throw(frappe._("<a href=""#Form/{3}/{0}"">#{0} - {1}</a> is booked by {2}").format(result.name, result.subject, employee_name, 'Resource Booking'))
 		
 		return result
 

@@ -98,7 +98,7 @@ scheduler_events = {
 # 		"vbooking.tasks.all"
 # 	],
  	"daily": [
- 		"vbooking.vbooking.doctype.resource_booking.resource_booking.send_event_digest"
+ 		# "vbooking.vbooking.doctype.resource_booking.resource_booking.send_event_digest"
  	]
 # 	"hourly": [
 # 		"vbooking.tasks.hourly"
